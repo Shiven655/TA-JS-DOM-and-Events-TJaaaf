@@ -110,14 +110,3 @@ function handleDelete(event) {
 
  todoInput.addEventListener("keyup", addTodo);
      
-
-     
- 
-
-        
-    
-
-    
-    
-    
-//exercise is not pushing into github
