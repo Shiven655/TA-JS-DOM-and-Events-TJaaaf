@@ -1,112 +1,109 @@
-
-let ulRoot = document.querySelector(".todos");
-let todoInput = document.querySelector(`input[type="text"]`);
-
-let all = document.querySelector(".all");
-let active = document.querySelector(".active");
-let all = document.querySelector(".completed");
-let all = document.querySelector(".clear");
+//create input box with basic UI of an emty list from html
+//when press enter should be added a list below
+//
+//when clicking cross it must delete
 
 
-let activeButton = "all";
-let allTodos = localStorage.getItem("allTodos")
-? JSON.parse(localStorage.getItem("allTodos"))
-: [];
-   
-function addTodo(event) {
-    if (event.keyCode == 13 && event.target.value) {
-        allTodos.push({
-            name: event.target.value,
-            isDone: false,
-        });
-        event.target.value = "";
-        createUI();
-        localStorage.setItem('allTodos', Json.stringify(allTodos));
+
+//create toggle
+//make the cross work with index-done
+function main(){
+    let rootElm=document.querySelector("ul")
+    let input=document.querySelector(`input[type="text"]`);
+    let list=document.querySelector("label");
+    let allMovies=localStorage.getItem("allMovies")?JSON.parse(localStorage.getItem("allMovies")):[];
+
+
+    //for all,activate,completed,etc
+    let all=document.querySelector(".all")
+    let complete=document.querySelector(".complete")
+    let active=document.querySelector(".active")
+    let clear=document.querySelector(".clear");    
+    //for deleting movies
+
+    function deleteMovie(event){
+        let id=event.target.dataset.id;
+        allMovies.splice(id,1);
+        createMovies(allMovies);
     }
-}
-function handleCheck(event) {
-    let id = event.target.dataset.id;
+    //for handling toggle
 
-    allTodos[id].isDone = !allTodos[id].isDone;
-    createUI();
-    localStorage.setItem('allTodos', Json.stringify(allTodos));
-}
-function handleDelete(event) {
-    let id = event.target.dataset.id;
-
-    allTodos.splice(id, 1);
-    createUI();
-    localStorage.setItem('allTodos', Json.stringify(allTodos));
-}
- function createUI(data = allTodos) {
-     ulRoot.innerHTML = "";
-     data.forEach((todo, i) => {
-         let li = document.createElement("li");
-         let input = document.createElement("input");
-         input.type = "checkbox";
-         input.checked = todo.isDone;
-         input.setAttribute("data-id", i);
-         input.addEventListener("click", handleCheck);
-         let p = document.createElement("p");
-         p.innerText = todo.name;
-         let span = document.createElement("span");
-         span.innerText = "X";
-         span.setAttribute("data-id", i);
-         span.addEventListener("click", handleDelete);
-         li.append(input, p, span);
-
-         ulRoot.append(li);
-     });
+    function handleToggle(event){
+        let id=event.target.dataset.id;
+        allMovies[id].watched=!allMovies[id].watched;
+        createMovies(allMovies);
     }
 
-    createUI();
+    //make li of the movie
+        /*<ul>
+            <li>
+              <input class="styled-checkbox" id="1" type="checkbox">
+              <label for="1">MovieName</label>
+              <button>X</button>
+            </li>
+          </ul>
+          */
+    function createMovies(array){
+        rootElm.innerHTML="";
+    array.forEach((elm,i)=>{
+    let li=document.createElement("li");
+    let inputUI=document.createElement("input");
+    inputUI.classList.add("styled-checkbox");
+    inputUI.id="i";
+    inputUI.checked=elm.watched;
+    inputUI.type="checkbox";
+    inputUI.setAttribute("data-id",i);
+    inputUI.addEventListener("input",handleToggle);
+    let label=document.createElement("label");
+    label.for="i";
+    label.innerText=elm.name;
+    let button=document.createElement("button");
+    button.innerText="X";
+    //let i=document.createElement("i");
+    //icheck.classList.add("fas fa-check-double");
+    //button.append(i);
+    //button.innerHTML=<i class="fas fa-check-double"></i>
+    button.setAttribute("data-id",i);
+    button.addEventListener("click",deleteMovie);
 
-    clear.addEventListener("click", () => {
-     allTodos = allTodos.filter(todo => !todo.isDone);
-     createUI();
-     localStorage.setItem('allTodos', Json.stringify(allTodos));
-    });
 
-    active.addEventListener("click", () => {
-        let notCompleted = allTodos.filter(todo => !todo.isDone);
-        createUI(notCompleted);
-        activeButton = "active";
-        updateActiveButton();
-       });
-
-    completed.addEventListener("click", () => {
-        let completedTodos = allTodos.filter(todo => todo.isDone);
-        createUI(CompletedTodos);
-        activeButton = "completed";
-        updateActiveButton();
-       });  
-
-       all.addEventListener("click", () => {
-        createUI();
-        activeButton = "all";
-        updateActiveButton();
-       });    
-
-       
-
-    function updateActiveButton(btn = activeButton) {
-        all.classList.remove("selected");
-        active.classList.remove("selected");
-        completed.classList.remove("selected");
-        if (btn == "all") {
-            all.classList.add("selected");
-        }
-        if (btn === "active") {
-            active.classList.add("selected");
-        }
-        if (btn === "completed") {
-            completed.classList.add("selected");
-        }
-
+    li.append(inputUI,label,button);
+    rootElm.append(li);
     }
+    )
+    }
+    input.addEventListener("keyup",(event)=>{
+        if(event.keyCode===13){
+        allMovies.push({
+            name:event.target.value,
+            watched:false
+        })
+        event.target.value="";
+        }
+    createMovies(allMovies);
+    localStorage.setItem("allMovies",JSON.stringify(allMovies));
+    })
 
+    complete.addEventListener("click",(event)=>{
+          let allComplete=allMovies.filter((elm)=>elm.watched)
+    createMovies(allComplete);
+    })
+    active.addEventListener("click",(event)=>{
+        let allactive=allMovies.filter((elm)=>!elm.watched)
+  createMovies(allactive);
+    })
+    all.addEventListener("click",()=>{
+        createMovies(allMovies);
+        localStorage.setItem("allMovies",JSON.stringify(allMovies));
+    })
+    clear.addEventListener("click",(event)=>{
+    allMovies=[];
+    createMovies(allMovies);
+    localStorage.setItem("allMovies",JSON.stringify(allMovies));
+    }
+    )
 
-
-
- todoInput.addEventListener("keyup", addTodo);
-     
+}
+main();
+    // create UI for ALL,ACTIVATED AND DONE
+    //
